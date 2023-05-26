@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>My experiment</title>
+    <script src="https://unpkg.com/jspsych@7.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.0.0"></script>
+    <link href="https://unpkg.com/jspsych@7.0.0/css/jspsych.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <script>
+        // jsPsychの初期化
+        const jsPsych = initJsPsych({
+            on_finish: function() {
+                jsPsych.data.displayData();
+                jsPsych.data.get().localSave('csv', 'mydata.csv');
+            }
+        }); 
+
+        // 画像の事前読み込み
+        const preload = {
+          type: jsPsychPreload,
+          images: ['circle.png',
+                  'triangle.png',
+                  'square.png',
+                  'star.png',
+                  'imc.png'
+                ]
+        };
+
+        // 刺激画像のファイル名を配列に格納
+        const image_pool = [
+            {image: ['<img src="circle.png" width="200px"/>'], label: "circle"},
+            {image: ['<img src="square.png" width="200px"/>'], label: "square"},
+            {image: ['<img src="star.png" width="200px"/>'], label: "star"},
+            {image: ['<img src="triangle.png" width="200px"/>'], label: "triangle"}
+        ];      
+
+        // 配列のランダム化
+        function random(array, num) {
+          var a = array; //配列 (関数randomの第一引数)
+          var t = []; // 一時的に配列の要素を保持するための変数
+          var r = []; //　選択された要素を格納するための変数
+          var l = a.length; // 配列aの長さ
+          var n = num < l ? num : l; // num (第二引数) とlを比較し，小さい方の値を変数nに代入
+          while (n-- > 0) { //ループを繰り返すたびに変数nの値が1ずつ引かれていく
+            var i = (Math.random() * l) | 0; // 0からl-1の整数をランダムに生成
+            r[n] = t[i] || a[i]; // 配列tのi番目の要素が，undefined
+            --l; //lから1を引く (n)
+            t[i] = t[l] || a[l]; //配列tのi番目の要素はtのl-1番目，またはaのl番目
+          }
+          return r;　//返り値は生成された配列r
+        }
+               
+        // 前半，後半の配列を用意
+        const stimuli_first = random(image_pool, 2)
+        const stimuli_last = image_pool.filter(i => stimuli_first.indexOf(i) == -1)
+        console.log(stimuli_first)
+        console.log(stimuli_last)
+      
+
+        // likert + 画像
+        // ラベル用変数
+        const likert_label = [
+                            "strongly disagree",
+                            "disagree",
+                            "neutral",
+                            "agree",
+                            "strongly agree"
+                        ];
+        
+        // 設問前半
+        const image_likert_first = {
+            timeline: [{
+                type: jsPsychSurveyLikert,
+                preamble: jsPsych.timelineVariable('image'),
+                questions: [
+                    {
+                        prompt: "I like this image",
+                        labels: likert_label
+                    }
+                ] 
+            }],
+            data: {stimulus: jsPsych.timelineVariable('label')},
+            timeline_variables: stimuli_first
+        }      
+
+
+        // IMC
+        const IMC = {
+          type: jsPsychSurveyLikert,
+          preamble: '<img src="imc.png" width="200px"/>',
+          questions:[{
+            prompt: "Do you like this image? Please select Neutral in this question.",
+            labels: likert_label
+        }]
+        }
+
+        // 設問後半
+        const image_likert_last = {
+            timeline: [{
+                type: jsPsychSurveyLikert,
+                preamble: jsPsych.timelineVariable('image'),
+                questions: [
+                    {
+                        prompt: "I like this image",
+                        labels: likert_label
+                    }
+                ] 
+            }],
+            timeline_variables: stimuli_last
+        }      
+
+
+        /*タイムラインの実行*/
+        jsPsych.run([preload, image_likert_first, IMC, image_likert_last]);
+
+    </script>
+  </body>
+</html>
