@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.0.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.2"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
     <link href="https://unpkg.com/jspsych@7.0.0/css/jspsych.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
@@ -16,7 +17,6 @@
         const jsPsych = initJsPsych({
             on_finish: function() {
                 jsPsych.data.displayData();
-                jsPsych.data.get().localSave('csv', 'mydata.csv');
             }
         }); 
 
@@ -30,6 +30,20 @@
                   'imc.png'
                 ]
         };
+      
+        // 参加者IDの付与
+        const subject_id = jsPsych.randomization.randomID(10);
+        const filename = `${subject_id}.csv`;
+      
+        // データ保存用
+              const save_data = {
+                type: jsPsychPipe,
+                action: "save",
+                experiment_id: "WJvVcNkkVgHm",
+                filename: filename,
+                data_string: ()=>jsPsych.data.get().csv()
+              };
+            
 
         // 刺激画像のファイル名を配列に格納
         const image_pool = [
@@ -116,7 +130,7 @@
 
 
         /*タイムラインの実行*/
-        jsPsych.run([preload, image_likert_first, IMC, image_likert_last]);
+        jsPsych.run([preload, image_likert_first, IMC, image_likert_last, save_data]);
 
     </script>
   </body>
