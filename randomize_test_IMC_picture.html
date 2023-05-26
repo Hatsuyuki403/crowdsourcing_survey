@@ -137,7 +137,7 @@
                 ] 
             }],
             data: {stimulus: jsPsych.timelineVariable('label')},
-            timeline_variables: stimuli_first,
+            timeline_variables: stimuli_last,
             on_finish: function(data){
               jsPsych.data.get().addToLast(data.response);
             } 
