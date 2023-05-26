@@ -51,7 +51,10 @@
             {image: ['<img src="square.png" width="200px"/>'], label: "square"},
             {image: ['<img src="star.png" width="200px"/>'], label: "star"},
             {image: ['<img src="triangle.png" width="200px"/>'], label: "triangle"}
-        ];      
+        ];    
+        const image_imc = [
+            {image: ['<img src="imc.png" width="200px"/>'], label: "imc"}
+        ];       
 
         // 配列のランダム化
         function random(array, num) {
@@ -109,11 +112,16 @@
         // IMC
         const IMC = {
           type: jsPsychSurveyLikert,
-          preamble: '<img src="imc.png" width="200px"/>',
+          preamble: jsPsych.timelineVariable('image'),
           questions:[{
             prompt: "Do you like this image? Please select Neutral in this question.",
             labels: likert_label
-        }]
+        }],
+            data: {stimulus: jsPsych.timelineVariable('label')},
+            timeline_variables: image_imc,
+            on_finish: function(data){
+              jsPsych.data.get().addToLast(data.response);
+            } 
         }
 
         // 設問後半
@@ -128,7 +136,11 @@
                     }
                 ] 
             }],
-            timeline_variables: stimuli_last
+            data: {stimulus: jsPsych.timelineVariable('label')},
+            timeline_variables: stimuli_first,
+            on_finish: function(data){
+              jsPsych.data.get().addToLast(data.response);
+            } 
         }      
 
 
