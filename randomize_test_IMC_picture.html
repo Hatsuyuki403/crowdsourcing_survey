@@ -15,7 +15,8 @@
     <script>
         // jsPsychの初期化
         const jsPsych = initJsPsych({
-            on_finish: function() {
+          // デバッグ用  
+          on_finish: function() {
                 jsPsych.data.displayData();
             }
         }); 
